@@ -1,0 +1,379 @@
+@import "tailwindcss";
+
+/* ─── NEO-BRUTALIST TOKENS ─── */
+@theme {
+  --color-bg: #fdf3df;
+  --color-paper: #fffef9;
+  --color-ink: #111111;
+  --color-lime: #c6f432;
+  --color-orange: #ff6b2b;
+  --color-teal: #2dd4bf;
+  --color-purple: #a78bfa;
+  --color-pink: #f472b6;
+  --color-border-width: 3px;
+  --color-shadow-chip: 3px 3px 0 #111;
+  --color-shadow-btn: 4px 4px 0 #111;
+  --color-shadow-card: 6px 6px 0 #111;
+  --color-shadow-panel: 8px 8px 0 #111;
+}
+
+/* ─── BASE STYLES ─── */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+}
+
+/* ─── DOT GRID BACKGROUND ─── */
+.nb-dot-grid {
+  background-image: radial-gradient(circle, #111 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: 0 0;
+  opacity: 0.06;
+}
+
+/* ─── TYPOGRAPHY ─── */
+.nb-h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--color-ink);
+}
+
+.nb-h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+
+.nb-h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.nb-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-ink);
+}
+
+.nb-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.nb-label {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── BOX (paper card with shadow) ─── */
+.nb-box {
+  background: var(--color-paper);
+  border: 3px solid var(--color-ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+
+.nb-box-lg {
+  background: var(--color-paper);
+  border: 3px solid var(--color-ink);
+  border-radius: 24px;
+  box-shadow: 8px 8px 0 var(--color-ink);
+}
+
+.nb-box-sm {
+  background: var(--color-paper);
+  border: 3px solid var(--color-ink);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+
+/* ─── TAG (small chip) ─── */
+.nb-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 3px solid var(--color-ink);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 var(--color-ink);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* ─── BADGE (pill readout) ─── */
+.nb-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── HIGHLIGHT BLOCK ─── */
+.nb-hl {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--color-lime);
+  border: 3px solid var(--color-ink);
+  border-radius: 8px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+}
+
+/* ─── BUTTONS ─── */
+.nb-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--color-orange);
+  color: #fff;
+  border: 3px solid var(--color-ink);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  min-height: 44px;
+}
+
+.nb-btn-primary:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+
+.nb-btn-primary:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-ink);
+}
+
+.nb-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nb-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 3px solid var(--color-ink);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  min-height: 44px;
+}
+
+.nb-btn-secondary:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+
+.nb-btn-secondary:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-ink);
+}
+
+.nb-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── INPUT ─── */
+.nb-input {
+  background: var(--color-paper);
+  border: 3px solid var(--color-ink);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  color: var(--color-ink);
+  transition: box-shadow 150ms ease;
+}
+
+.nb-input:focus {
+  outline: none;
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+
+/* ─── SEGMENTED CONTROL ─── */
+.nb-segment {
+  display: flex;
+  gap: 0;
+  border: 3px solid var(--color-ink);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 3px 3px 0 var(--color-ink);
+}
+
+.nb-segment button {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: none;
+  border-right: 3px solid var(--color-ink);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+  min-height: 44px;
+}
+
+.nb-segment button:last-child {
+  border-right: none;
+}
+
+.nb-segment button.nb-active {
+  background: var(--color-lime);
+}
+
+/* ─── COLOR SWATCH ─── */
+.nb-swatch {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--color-ink);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 150ms ease;
+}
+
+.nb-swatch.nb-selected {
+  box-shadow: 0 0 0 3px var(--color-lime), 3px 3px 0 var(--color-ink);
+}
+
+/* ─── FOCUS ─── */
+*:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+  border-radius: 4px;
+}
+
+/* ─── HISTORY TILT ─── */
+.nb-history-card {
+  transition: transform 200ms ease;
+}
+
+.nb-history-card:nth-child(odd):hover {
+  transform: rotate(-1deg);
+}
+
+.nb-history-card:nth-child(even):hover {
+  transform: rotate(1deg);
+}
+
+/* ─── FLOATING BOB ANIMATION ─── */
+@keyframes nb-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.nb-bob {
+  animation: nb-bob 3s ease-in-out infinite;
+}
+
+.nb-bob-delay {
+  animation: nb-bob 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.nb-bob-delay-2 {
+  animation: nb-bob 3s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* ─── REDUCED MOTION ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ─── COLOR INPUT RESET ─── */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 3px solid var(--color-ink);
+  border-radius: 8px;
+  padding: 0;
+  cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* ─── PLATFORM ACCENT COLORS ─── */
+.nb-platform-facebook { background: #1877f2; color: #fff; }
+.nb-platform-x { background: var(--color-paper); color: var(--color-ink); }
+.nb-platform-instagram { background: #e4405f; color: #fff; }
+.nb-platform-tiktok { background: var(--color-ink); color: #fff; }
+.nb-platform-youtube { background: #ff0000; color: #fff; }
+.nb-platform-linkedin { background: #0a66c2; color: #fff; }
+.nb-platform-whatsapp { background: #25d366; color: var(--color-ink); }
+.nb-platform-telegram { background: #0088cc; color: #fff; }
+.nb-platform-github { background: var(--color-ink); color: #fff; }
+.nb-platform-claude { background: var(--color-teal); color: var(--color-ink); }
+.nb-platform-reddit { background: #ff4500; color: #fff; }
+.nb-platform-spotify { background: #1db954; color: var(--color-ink); }
+.nb-platform-maps { background: #4285f4; color: #fff; }
+.nb-platform-generic { background: var(--color-paper); color: var(--color-ink); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 860px) {
+  .nb-hero-stage {
+    height: 320px;
+  }
+}

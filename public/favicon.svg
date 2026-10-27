@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#c6f432"/>
+  
+  <!-- Border -->
+  <rect x="16" y="16" width="480" height="480" fill="none" stroke="#111" stroke-width="32"/>
+  
+  <!-- QR-like pattern - top left -->
+  <rect x="80" y="80" width="120" height="120" fill="#111"/>
+  <rect x="100" y="100" width="80" height="80" fill="#c6f432"/>
+  <rect x="120" y="120" width="40" height="40" fill="#111"/>
+  
+  <!-- QR-like pattern - top right -->
+  <rect x="312" y="80" width="120" height="120" fill="#111"/>
+  <rect x="332" y="100" width="80" height="80" fill="#c6f432"/>
+  <rect x="352" y="120" width="40" height="40" fill="#111"/>
+  
+  <!-- QR-like pattern - bottom left -->
+  <rect x="80" y="312" width="120" height="120" fill="#111"/>
+  <rect x="100" y="332" width="80" height="80" fill="#c6f432"/>
+  <rect x="120" y="352" width="40" height="40" fill="#111"/>
+  
+  <!-- Center pattern -->
+  <rect x="236" y="236" width="40" height="40" fill="#111"/>
+  <rect x="236" y="284" width="40" height="40" fill="#111"/>
+  <rect x="284" y="236" width="40" height="40" fill="#111"/>
+  <rect x="284" y="284" width="40" height="40" fill="#111"/>
+</svg>
