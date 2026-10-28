@@ -56,7 +56,6 @@ export function Dropdown({ id, value, options, onChange, error, ...props }: Drop
 
   return (
     <div ref={dropdownRef} className="relative">
-      {/* Dropdown Trigger Button */}
       <button
         id={id}
         type="button"
@@ -87,7 +86,6 @@ export function Dropdown({ id, value, options, onChange, error, ...props }: Drop
         />
       </button>
 
-      {/* Dropdown Options List */}
       {isOpen && (
         <div
           role="listbox"

@@ -26,12 +26,12 @@ function HistoryItem({ entry, onRemove, onReopen }: { entry: HistoryEntry; onRem
 
   return (
     <div
-      className="nb-history-card p-4 group transition-all duration-150 w-full"
+      className="nb-history-card p-4 group transition-all duration-150"
       style={{
         backgroundColor: 'var(--color-paper)',
         border: '3px solid var(--color-ink)',
         borderRadius: '16px',
-        boxShadow: '4px 4px 0 var(--color-ink)',
+        boxShadow: '6px 6px 0 var(--color-ink)',
       }}
     >
       <div className="flex items-start gap-3">
@@ -66,25 +66,24 @@ function HistoryItem({ entry, onRemove, onReopen }: { entry: HistoryEntry; onRem
           <div className="flex items-center gap-2 mt-2">
             <button
               onClick={() => onReopen(entry)}
-              className="px-2.5 py-1.5 flex items-center gap-1 text-xs font-bold transition-all duration-150 min-h-[36px]"
+              className="p-2 transition-all duration-150 min-w-[44px] min-h-[44px] flex items-center justify-center"
               style={{
                 backgroundColor: 'var(--color-paper)',
                 border: '2px solid var(--color-ink)',
-                borderRadius: '8px',
+                borderRadius: '6px',
                 color: 'var(--color-ink)',
               }}
               aria-label="Re-open this URL"
             >
-              <ExternalLink size={12} />
-              <span>Open</span>
+              <ExternalLink size={14} />
             </button>
             <button
               onClick={() => onRemove(entry.id)}
-              className="px-2.5 py-1.5 flex items-center gap-1 text-xs font-bold transition-all duration-150 min-h-[36px]"
+              className="p-2 transition-all duration-150 min-w-[44px] min-h-[44px] flex items-center justify-center"
               style={{
                 backgroundColor: 'var(--color-paper)',
                 border: '2px solid var(--color-ink)',
-                borderRadius: '8px',
+                borderRadius: '6px',
                 color: 'var(--color-ink)',
               }}
               onMouseEnter={(e) => {
@@ -97,8 +96,7 @@ function HistoryItem({ entry, onRemove, onReopen }: { entry: HistoryEntry; onRem
               }}
               aria-label="Delete this entry"
             >
-              <Trash2 size={12} />
-              <span>Delete</span>
+              <Trash2 size={14} />
             </button>
           </div>
         </div>
@@ -116,7 +114,7 @@ export function HistoryGrid({ entries, onRemove, onClearAll, onReopen }: History
   );
 
   return (
-    <div className="space-y-5 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div className="space-y-5">
       {/* Search and controls */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="flex-1 relative">
@@ -141,7 +139,7 @@ export function HistoryGrid({ entries, onRemove, onClearAll, onReopen }: History
         {entries.length > 0 && (
           <button
             onClick={onClearAll}
-            className="nb-btn-secondary !py-3 !px-4 !text-xs whitespace-nowrap justify-center"
+            className="nb-btn-secondary !py-3 !px-4 !text-xs"
             style={{ backgroundColor: 'var(--color-pink)' }}
           >
             Clear All

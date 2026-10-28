@@ -17,6 +17,7 @@ import { getPayloadType } from '../lib/payloads';
 import { DEFAULT_STYLE, loadHistory, saveHistory, addEntry, loadSettings, saveSettings } from '../lib/history';
 import type { StyleSettings, HistoryEntry } from '../lib/history';
 import { Undo2, Info } from 'lucide-react';
+import { StyledExportPanel } from '../components/StyledExportPanel';
 
 // localStorage keys
 const LAST_TAB_KEY = 'qrlink_last_tab';
@@ -83,7 +84,7 @@ export function GeneratorPage() {
   const [allFieldValues, setAllFieldValues] = useState<Record<string, Record<string, string | boolean>>>(loadFieldValues());
   const currentFieldValues = allFieldValues[activeType] || {};
   
-  // URL-specific state (kept for backward compatibility)
+  // URL-specific state
   const [rawInput, setRawInput] = useState('');
   const [sanitizedUrl, setSanitizedUrl] = useState('');
   const [sanitizeError, setSanitizeError] = useState<string | undefined>();
@@ -95,10 +96,21 @@ export function GeneratorPage() {
   // Shared state
   const [style, setStyle] = useState<StyleSettings>(DEFAULT_STYLE);
   const [qrInstance, setQrInstance] = useState<QRCodeStyling | null>(null);
+  const [qrCanvas, setQrCanvas] = useState<HTMLCanvasElement | null>(null);
   const [duplicateFlash, setDuplicateFlash] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [debouncedPayload, setDebouncedPayload] = useState('');
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  
+  // Clear stale 3D view localStorage on mount
+  useEffect(() => {
+    try {
+      localStorage.removeItem('qrlink_view_3d');
+      localStorage.removeItem('qrlink_tree_season');
+    } catch {
+      // ignore
+    }
+  }, []);
   
   // Validation state for non-URL types
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -280,39 +292,37 @@ export function GeneratorPage() {
     hostname = new URL(payload || 'https://link').hostname.replace('www.', '');
   } catch { /* ignore */ }
 
-  // Determine if we should show the QR
   const shouldShowQR = activeType === 'url' 
     ? (sanitizedUrl && !sanitizeError)
     : (payload && Object.keys(validationErrors).length === 0);
 
-  // Get warnings for display
   const displayWarnings = activeType === 'url' 
     ? (sanitizeWarning ? [sanitizeWarning] : [])
     : validationWarnings;
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 w-full overflow-x-hidden">
-      {/* Hero section */}
-      <div className="grid grid-cols-1 gap-6 mb-6 sm:mb-10 w-full">
-        <div className="flex flex-col lg:flex-row items-start gap-6 w-full">
-          {/* Hero text + input */}
-          <div className="flex-1 min-w-0 w-full">
-            <h1 className="nb-h1 mb-2 sm:mb-4 text-2xl sm:text-5xl leading-tight">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-10 overflow-x-hidden">
+      {/* Hero & Input Section */}
+      <section className="mb-6 lg:mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          {/* Main Form/Input Area */}
+          <div className="lg:col-span-7 xl:col-span-8 w-full min-w-0">
+            <h1 className="nb-h1 mb-2.5 text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
               Paste a link.{' '}
               <br className="hidden sm:inline" />
               Get a{' '}
-              <span className="nb-hl inline-block sm:-translate-y-0.5">
+              <span className="nb-hl inline-block transform -translate-y-0.5 sm:-translate-y-1">
                 QR code.
               </span>
             </h1>
-            <p className="nb-body mb-4 sm:mb-8 text-xs sm:text-base" style={{ opacity: 0.7 }}>
+            <p className="nb-body mb-5 text-sm sm:text-lg opacity-80">
               Free, instant, and 100% private. Nothing leaves your browser.
             </p>
 
-            {/* Duplicate flash */}
+            {/* Duplicate Flash Notification */}
             {duplicateFlash && (
               <div
-                className="mb-3 px-3 py-2 text-xs sm:text-sm font-bold animate-bounce"
+                className="mb-4 px-3 py-2 text-xs sm:text-sm font-bold animate-fade-in"
                 style={{
                   backgroundColor: 'var(--color-lime)',
                   color: 'var(--color-ink)',
@@ -325,33 +335,30 @@ export function GeneratorPage() {
               </div>
             )}
 
-            {/* Input inside hero box */}
+            {/* Main Interactive Box */}
             <div
-              className="p-3 sm:p-6 w-full"
+              className="p-3 sm:p-6 lg:p-8 w-full transition-all duration-200"
               style={{
                 backgroundColor: 'var(--color-paper)',
                 border: '3px solid var(--color-ink)',
-                borderRadius: '16px',
-                boxShadow: '4px 4px 0 var(--color-ink)',
+                borderRadius: '20px',
+                boxShadow: '5px 5px 0 var(--color-ink)',
               }}
             >
-              {/* Tab row */}
-              <div className="mb-4 sm:mb-6 overflow-x-auto pb-1 scrollbar-none">
+              {/* Tab navigation bar with horizontal scroll support */}
+              <div className="mb-5 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1">
                 <PayloadTabs activeType={activeType} onChange={handleTabChange} />
               </div>
 
-              {/* URL input (only for URL type) */}
-              {activeType === 'url' && (
+              {/* Dynamic Payload Form Input */}
+              {activeType === 'url' ? (
                 <UrlInput
                   value={rawInput}
                   onChange={setRawInput}
                   error={sanitizeError}
                   warning={sanitizeWarning}
                 />
-              )}
-
-              {/* Form for other types */}
-              {activeType !== 'url' && (() => {
+              ) : (() => {
                 const payloadType = getPayloadType(activeType);
                 if (!payloadType) return null;
                 return (
@@ -367,102 +374,101 @@ export function GeneratorPage() {
             </div>
           </div>
 
-          {/* Decorative stage (≥1024px) */}
-          <div
-            className="nb-hero-stage hidden lg:flex flex-col items-center justify-center gap-4 p-6 relative"
-            style={{
-              width: '340px',
-              minHeight: '400px',
-              flexShrink: 0,
-            }}
-            aria-hidden="true"
-          >
-            {/* c1 - teal card */}
+          {/* Decorative Preview Stage (Desktop View Only >= 1024px) */}
+          <div className="hidden lg:flex lg:col-span-5 xl:col-span-4 justify-center">
             <div
-              className="nb-bob w-full p-5 relative"
+              className="nb-hero-stage flex flex-col items-center justify-center gap-4 p-6 w-full max-w-[340px] relative"
               style={{
-                backgroundColor: 'var(--color-teal)',
-                border: '3px solid var(--color-ink)',
-                borderRadius: '16px',
-                boxShadow: '6px 6px 0 var(--color-ink)',
+                minHeight: '380px',
               }}
+              aria-hidden="true"
             >
-              <div className="flex gap-2">
-                <div className="h-3 rounded-full flex-1" style={{ backgroundColor: 'var(--color-lime)', border: '2px solid var(--color-ink)' }} />
-                <div className="h-3 rounded-full w-16" style={{ backgroundColor: 'var(--color-pink)', border: '2px solid var(--color-ink)' }} />
+              {/* Teal Card */}
+              <div
+                className="nb-bob w-full p-5 relative"
+                style={{
+                  backgroundColor: 'var(--color-teal)',
+                  border: '3px solid var(--color-ink)',
+                  borderRadius: '16px',
+                  boxShadow: '6px 6px 0 var(--color-ink)',
+                }}
+              >
+                <div className="flex gap-2">
+                  <div className="h-3 rounded-full flex-1" style={{ backgroundColor: 'var(--color-lime)', border: '2px solid var(--color-ink)' }} />
+                  <div className="h-3 rounded-full w-16" style={{ backgroundColor: 'var(--color-pink)', border: '2px solid var(--color-ink)' }} />
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <div className="h-3 rounded-full w-20" style={{ backgroundColor: 'var(--color-lime)', border: '2px solid var(--color-ink)' }} />
+                  <div className="h-3 rounded-full flex-1" style={{ backgroundColor: 'var(--color-pink)', border: '2px solid var(--color-ink)' }} />
+                </div>
               </div>
-              <div className="mt-3 flex gap-2">
-                <div className="h-3 rounded-full w-20" style={{ backgroundColor: 'var(--color-lime)', border: '2px solid var(--color-ink)' }} />
-                <div className="h-3 rounded-full flex-1" style={{ backgroundColor: 'var(--color-pink)', border: '2px solid var(--color-ink)' }} />
-              </div>
-            </div>
 
-            {/* c2 - paper card with checker pattern */}
-            <div
-              className="nb-bob-delay w-full p-5 relative"
-              style={{
-                backgroundColor: 'var(--color-paper)',
-                border: '3px solid var(--color-ink)',
-                borderRadius: '16px',
-                boxShadow: '6px 6px 0 var(--color-ink)',
-              }}
-            >
-              {/* Checker QR block */}
-              <div className="grid grid-cols-5 gap-0.5 mb-3">
-                {Array.from({ length: 25 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="aspect-square rounded-sm"
-                    style={{
-                      backgroundColor: (i + Math.floor(i / 5)) % 2 === 0 ? 'var(--color-ink)' : 'transparent',
-                      border: (i + Math.floor(i / 5)) % 2 === 0 ? '1px solid var(--color-ink)' : '1px solid rgba(17,17,17,0.15)',
-                    }}
-                  />
-                ))}
+              {/* Paper Checker Card */}
+              <div
+                className="nb-bob-delay w-full p-5 relative"
+                style={{
+                  backgroundColor: 'var(--color-paper)',
+                  border: '3px solid var(--color-ink)',
+                  borderRadius: '16px',
+                  boxShadow: '6px 6px 0 var(--color-ink)',
+                }}
+              >
+                <div className="grid grid-cols-5 gap-0.5 mb-3">
+                  {Array.from({ length: 25 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square rounded-sm"
+                      style={{
+                        backgroundColor: (i + Math.floor(i / 5)) % 2 === 0 ? 'var(--color-ink)' : 'transparent',
+                        border: (i + Math.floor(i / 5)) % 2 === 0 ? '1px solid var(--color-ink)' : '1px solid rgba(17,17,17,0.15)',
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="h-4 rounded" style={{ backgroundColor: 'var(--color-pink)', border: '2px solid var(--color-ink)' }} />
               </div>
-              <div className="h-4 rounded" style={{ backgroundColor: 'var(--color-pink)', border: '2px solid var(--color-ink)' }} />
-            </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              <span className="nb-tag nb-platform-facebook" style={{ fontSize: '0.7rem' }}>Facebook</span>
-              <span className="nb-tag nb-platform-x" style={{ fontSize: '0.7rem' }}>X</span>
-              <span className="nb-tag nb-platform-claude" style={{ fontSize: '0.7rem' }}>Claude</span>
-              <span className="nb-tag" style={{ backgroundColor: 'var(--color-orange)', color: '#fff', fontSize: '0.7rem' }}>Scanned!</span>
+              {/* Floating Meta Tags */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                <span className="nb-tag nb-platform-facebook text-xs px-2 py-0.5">Facebook</span>
+                <span className="nb-tag nb-platform-x text-xs px-2 py-0.5">X</span>
+                <span className="nb-tag nb-platform-tiktok text-xs px-2 py-0.5">Tiktok</span>
+                <span className="nb-tag text-xs px-2 py-0.5" style={{ backgroundColor: 'var(--color-orange)', color: '#fff' }}>Scanned!</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Cleaned link row (URL type only) */}
+      {/* URL Meta / Sanitization Status Banners */}
       {activeType === 'url' && normalized && normalized.changed && !useOriginal && (
         <div
-          className="mb-4 px-3 sm:px-5 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full"
+          className="mb-5 p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
           style={{
             backgroundColor: 'var(--color-teal)',
             border: '3px solid var(--color-ink)',
-            borderRadius: '14px',
+            borderRadius: '16px',
             boxShadow: '4px 4px 0 var(--color-ink)',
           }}
         >
           <div className="flex-1 min-w-0 w-full sm:w-auto">
-            <p className="nb-label mb-0.5 text-xs" style={{ color: 'var(--color-ink)' }}>
+            <p className="nb-label text-xs mb-0.5 uppercase tracking-wider font-bold" style={{ color: 'var(--color-ink)' }}>
               Cleaned link
             </p>
-            <p className="text-xs truncate font-medium" style={{ color: 'var(--color-ink)', fontFamily: "'JetBrains Mono', monospace" }}>
+            <p className="text-xs sm:text-sm font-mono font-medium truncate break-all" style={{ color: 'var(--color-ink)' }}>
               {normalized.displayUrl}
             </p>
             {normalized.removedParams.length > 0 && (
-              <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'var(--color-ink)', opacity: 0.7 }}>
+              <p className="text-xs mt-1 font-medium opacity-80 break-words" style={{ color: 'var(--color-ink)' }}>
                 Removed: {normalized.removedParams.join(', ')}
               </p>
             )}
           </div>
           <button
             onClick={() => setUseOriginal(true)}
-            className="nb-btn-secondary !py-1.5 !px-3 !text-xs whitespace-nowrap w-full sm:w-auto justify-center"
+            className="nb-btn-secondary w-full sm:w-auto shrink-0 !py-2 !px-3.5 !text-xs flex items-center justify-center gap-1.5"
           >
-            <Undo2 size={12} />
+            <Undo2 size={14} />
             Use original
           </button>
         </div>
@@ -471,40 +477,40 @@ export function GeneratorPage() {
       {activeType === 'url' && useOriginal && (
         <button
           onClick={() => setUseOriginal(false)}
-          className="mb-3 flex items-center gap-1.5 text-xs font-bold transition-colors duration-150"
+          className="mb-4 flex items-center gap-1.5 text-xs sm:text-sm font-bold transition-colors hover:underline"
           style={{ color: 'var(--color-ink)' }}
         >
-          <Undo2 size={12} />
+          <Undo2 size={14} />
           Using original URL — switch back to cleaned
         </button>
       )}
 
-      {/* Platform chip (URL type only) */}
+      {/* Platform Chip */}
       {activeType === 'url' && platform && sanitizedUrl && (
-        <div className="mb-4">
+        <div className="mb-5">
           <PlatformChip name={platform.name} icon={platform.icon} note={platform.note} />
         </div>
       )}
 
-      {/* Type badge for non-URL types */}
+      {/* Type Badge Header (Non-URL types) */}
       {activeType !== 'url' && payload && (
-        <div className="mb-4 flex items-center gap-2 flex-wrap">
-          <span className="nb-badge text-xs px-2 py-0.5" style={{ backgroundColor: 'var(--color-lime)', color: 'var(--color-ink)' }}>
+        <div className="mb-5 flex flex-wrap items-center gap-2 sm:gap-3">
+          <span className="nb-badge px-3 py-1 text-xs sm:text-sm font-bold" style={{ backgroundColor: 'var(--color-lime)', color: 'var(--color-ink)' }}>
             {getPayloadType(activeType)?.label}
           </span>
-          <span className="nb-badge text-xs px-2 py-0.5" style={{ backgroundColor: 'var(--color-pink)', color: 'var(--color-ink)' }}>
+          <span className="nb-badge px-3 py-1 text-xs sm:text-sm font-bold" style={{ backgroundColor: 'var(--color-pink)', color: 'var(--color-ink)' }}>
             {payload.length} chars
           </span>
         </div>
       )}
 
-      {/* Warnings */}
+      {/* Warnings List */}
       {displayWarnings.length > 0 && (
-        <div className="mb-4 space-y-2">
+        <div className="mb-5 space-y-2">
           {displayWarnings.map((warning, i) => (
             <div
               key={i}
-              className="px-3 py-2 text-xs font-medium break-words"
+              className="px-3.5 py-2.5 text-xs sm:text-sm font-bold"
               style={{
                 backgroundColor: 'var(--color-lime)',
                 color: 'var(--color-ink)',
@@ -519,47 +525,65 @@ export function GeneratorPage() {
         </div>
       )}
 
-      {/* Main content: QR + Style */}
+      {/* Generator Workspace: Dynamic Dual Column Layout */}
       {shouldShowQR ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full">
-          {/* QR Preview */}
-          <div className="flex flex-col items-center justify-center p-4 sm:p-8 nb-box-lg w-full">
-            <QrPreview
-              url={debouncedPayload}
-              style={style}
-              onInstanceChange={setQrInstance}
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          {/* Left / Top Container: QR Preview */}
+          <div className="lg:col-span-5 xl:col-span-5 w-full lg:sticky lg:top-6 z-10">
+            <div className="flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 nb-box-lg w-full min-h-[280px] sm:min-h-[380px]">
+              <QrPreview
+                url={debouncedPayload}
+                style={style}
+                onInstanceChange={setQrInstance}
+                onCanvasReady={setQrCanvas}
+              />
+            </div>
           </div>
 
-          {/* Style Panel */}
-          <StylePanel
-            style={style}
-            onChange={setStyle}
-            contrastWarning={contrastWarning}
-          />
+          {/* Right / Bottom Container: Styling Options */}
+          <div className="lg:col-span-7 xl:col-span-7 w-full min-w-0">
+            <StylePanel
+              style={style}
+              onChange={setStyle}
+              contrastWarning={contrastWarning}
+            />
+          </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-12 sm:py-20 nb-box-lg px-4 text-center w-full">
+        /* Empty State */
+        <div className="flex flex-col items-center justify-center py-12 sm:py-24 px-4 nb-box-lg text-center">
           <div
-            className="w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center mb-3"
+            className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-4 shrink-0"
             style={{
               backgroundColor: 'var(--color-paper)',
               border: '3px dashed var(--color-ink)',
-              borderRadius: '14px',
+              borderRadius: '16px',
             }}
           >
-            <Info size={24} style={{ color: 'var(--color-ink)', opacity: 0.5 }} />
+            <Info size={26} className="opacity-50" style={{ color: 'var(--color-ink)' }} />
           </div>
-          <p className="text-xs sm:text-sm font-medium" style={{ color: 'var(--color-ink)', opacity: 0.6 }}>
-            {activeType === 'url' ? 'Enter a URL above to generate your QR code.' : 'Fill in the fields to generate your QR code.'}
+          <p className="text-xs sm:text-base font-medium opacity-70 max-w-sm" style={{ color: 'var(--color-ink)' }}>
+            {activeType === 'url' ? 'Enter a valid URL above to generate your QR code.' : 'Fill out the required fields above to generate your QR code.'}
           </p>
         </div>
       )}
 
-      {/* Export bar */}
+      {/* Styled Export Card */}
+      {shouldShowQR && qrCanvas && (
+        <div className="mt-6 sm:mt-8">
+          <StyledExportPanel
+            qrCanvas={qrCanvas}
+            payload={debouncedPayload}
+            host={hostname}
+            platform={platform?.name}
+          />
+        </div>
+      )}
+
+      {/* Export Bar */}
       {shouldShowQR && (
-        <div className="mt-4 sticky bottom-3 z-25 w-full">
-          <ExportBar instance={qrInstance} hostname={hostname} />
+        <div className="mt-6 sm:mt-8">
+          <ExportBar instance={qrInstance} hostname={hostname} payload={debouncedPayload} />
         </div>
       )}
     </div>

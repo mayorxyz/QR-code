@@ -376,4 +376,78 @@ input[type="color"]::-webkit-color-swatch {
   .nb-hero-stage {
     height: 320px;
   }
+  
+  /* Mobile optimizations */
+  .nb-h1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+  
+  .nb-h2 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+  
+  .nb-box, .nb-box-lg {
+    border-radius: 12px;
+    box-shadow: 4px 4px 0 var(--color-ink);
+  }
+  
+  .nb-btn-primary, .nb-btn-secondary {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    min-height: 44px;
+  }
+  
+  .nb-segment button {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Small mobile optimizations */
+@media (max-width: 480px) {
+  .nb-h1 {
+    font-size: clamp(1.75rem, 9vw, 2.5rem);
+  }
+  
+  .nb-body {
+    font-size: 0.9rem;
+  }
+  
+  /* Reduce shadows on small screens */
+  .nb-box {
+    box-shadow: 3px 3px 0 var(--color-ink);
+  }
+  
+  .nb-box-lg {
+    box-shadow: 4px 4px 0 var(--color-ink);
+  }
+  
+  /* Smaller padding on mobile */
+  .nb-box, .nb-box-lg {
+    padding: 16px;
+  }
+  
+  /* Stack export buttons on mobile */
+  .export-bar-mobile {
+    flex-direction: column;
+  }
+  
+  .export-bar-mobile button {
+    width: 100%;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .nb-btn-primary, .nb-btn-secondary {
+    min-height: 48px;
+  }
+  
+  .nb-segment button {
+    min-height: 48px;
+  }
+  
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
 }

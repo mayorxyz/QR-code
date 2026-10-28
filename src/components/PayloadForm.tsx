@@ -1,5 +1,5 @@
 import type { PayloadType, PayloadField } from '../lib/payloads';
-import { Dropdown } from './dropdown';
+import { Dropdown } from './Dropdown';
 
 interface PayloadFormProps {
   type: PayloadType;
@@ -11,7 +11,7 @@ interface PayloadFormProps {
 
 export function PayloadForm({ type, values, errors, hints, onChange }: PayloadFormProps) {
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4">
       {type.fields.map(field => (
         <FormField
           key={field.id}
@@ -49,10 +49,10 @@ function FormField({ field, value, error, hint, onChange }: FormFieldProps) {
   };
 
   return (
-    <div className="w-full">
+    <div>
       <label
         htmlFor={inputId}
-        className="block mb-2 text-xs sm:text-sm font-bold"
+        className="block mb-2 text-sm font-bold"
         style={{ fontFamily: "'Bricolage Grotesque', sans-serif", color: 'var(--color-ink)' }}
       >
         {field.label}
@@ -76,27 +76,27 @@ function FormField({ field, value, error, hint, onChange }: FormFieldProps) {
         <Dropdown
           id={inputId}
           value={String(value)}
-          options={field.options ?? []}
-          onChange={(v) => onChange(v)}
+          options={field.options || []}
+          onChange={(val) => onChange(val)}
           error={!!error}
           aria-describedby={error ? errorId : hint ? hintId : undefined}
           aria-invalid={!!error}
         />
       ) : field.type === 'checkbox' ? (
-        <label className="flex items-center gap-3 cursor-pointer py-1">
+        <label className="flex items-center gap-3 cursor-pointer">
           <input
             id={inputId}
             type="checkbox"
             checked={Boolean(value)}
             onChange={(e) => onChange(e.target.checked)}
-            className="w-5 h-5 cursor-pointer shrink-0"
+            className="w-5 h-5 cursor-pointer"
             style={{
               accentColor: 'var(--color-lime)',
               border: '2px solid var(--color-ink)',
             }}
             aria-describedby={hint ? hintId : undefined}
           />
-          <span className="text-xs sm:text-sm font-medium" style={{ color: 'var(--color-ink)' }}>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-ink)' }}>
             {field.label}
           </span>
         </label>
@@ -119,13 +119,12 @@ function FormField({ field, value, error, hint, onChange }: FormFieldProps) {
           id={errorId}
           role="alert"
           aria-live="polite"
-          className="mt-2 px-3 py-2 text-xs font-medium break-words"
+          className="mt-2 px-3 py-2 text-xs font-medium"
           style={{
             backgroundColor: 'var(--color-pink)',
             color: 'var(--color-ink)',
             border: '3px solid var(--color-ink)',
             borderRadius: '8px',
-            boxShadow: '2px 2px 0 var(--color-ink)',
           }}
         >
           {error}
@@ -135,13 +134,12 @@ function FormField({ field, value, error, hint, onChange }: FormFieldProps) {
       {hint && !error && (
         <div
           id={hintId}
-          className="mt-2 px-3 py-2 text-xs font-medium break-words"
+          className="mt-2 px-3 py-2 text-xs font-medium"
           style={{
             backgroundColor: 'var(--color-lime)',
             color: 'var(--color-ink)',
             border: '3px solid var(--color-ink)',
             borderRadius: '8px',
-            boxShadow: '2px 2px 0 var(--color-ink)',
           }}
         >
           {hint}
@@ -149,7 +147,7 @@ function FormField({ field, value, error, hint, onChange }: FormFieldProps) {
       )}
 
       {field.hint && !hint && !error && (
-        <p className="mt-1.5 text-xs font-medium break-words" style={{ color: 'var(--color-ink)', opacity: 0.6 }}>
+        <p className="mt-1 text-xs font-medium" style={{ color: 'var(--color-ink)', opacity: 0.6 }}>
           {field.hint}
         </p>
       )}

@@ -35,22 +35,26 @@ export function HistoryPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <div className="mb-8">
-        <h1 className="nb-h2 mb-2">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      {/* Header section with mobile scaling */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="nb-h2 mb-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight">
           History.
         </h1>
-        <p className="nb-body" style={{ opacity: 0.7 }}>
+        <p className="nb-body text-sm sm:text-base opacity-70">
           Your recently generated QR codes. Stored locally in your browser.
         </p>
       </div>
 
-      <HistoryGrid
-        entries={entries}
-        onRemove={handleRemove}
-        onClearAll={handleClearAll}
-        onReopen={handleReopen}
-      />
+      {/* Grid container with full responsiveness */}
+      <div className="w-full">
+        <HistoryGrid
+          entries={entries}
+          onRemove={handleRemove}
+          onClearAll={handleClearAll}
+          onReopen={handleReopen}
+        />
+      </div>
     </div>
   );
 }

@@ -52,7 +52,7 @@ export function StylePanel({ style, onChange, contrastWarning }: StylePanelProps
 
   return (
     <div
-      className="p-6 space-y-5"
+      className="p-4 sm:p-6 space-y-4 sm:space-y-5"
       style={{
         backgroundColor: 'var(--color-paper)',
         border: '3px solid var(--color-ink)',

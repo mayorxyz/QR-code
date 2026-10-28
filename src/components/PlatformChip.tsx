@@ -43,18 +43,15 @@ export function PlatformChip({ name, icon, note }: PlatformChipProps) {
   const platformClass = PLATFORM_CLASSES[icon] || PLATFORM_CLASSES.link;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full">
-      <span className={`nb-tag ${platformClass} inline-flex items-center gap-1.5 shrink-0`}>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="shrink-0">
+    <div className="flex items-center gap-3">
+      <span className={`nb-tag ${platformClass}`}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
           <path d={path} />
         </svg>
-        <span>{name}</span>
+        {name}
       </span>
       {note && (
-        <span 
-          className="text-xs font-medium break-words" 
-          style={{ color: 'var(--color-ink)', fontFamily: "'JetBrains Mono', monospace" }}
-        >
+        <span className="text-xs font-medium" style={{ color: 'var(--color-ink)', fontFamily: "'JetBrains Mono', monospace" }}>
           {note}
         </span>
       )}
